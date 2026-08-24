@@ -12,14 +12,18 @@ const sections = ['Dashboard','Add Entry','Transactions','Budgets','Analysis','S
 
 export default function App(){
   const [tab, setTab] = useState('Dashboard');
+  const [menuOpen, setMenuOpen] = useState(false);
   const banner = useBackupReminderBanner();
 
   return (
     <div className="app-layout">
-      <NavBar current={tab} setCurrent={setTab} items={sections} />
+      <NavBar current={tab} setCurrent={setTab} items={sections} mobileOpen={menuOpen} setMobileOpen={setMenuOpen} />
       <main className="main">
+        <header className="page-header">
+          <button className="hamburger" aria-label="Open menu" onClick={()=> setMenuOpen(true)}>☰</button>
+          <h2>{tab}</h2>
+        </header>
         {banner}
-        <header className="page-header"><h2>{tab}</h2></header>
         <div className="content">
           {tab === 'Dashboard' && <Dashboard />}
           {tab === 'Add Entry' && <AddEntryForm onSaved={()=>setTab('Transactions')} />}
@@ -29,6 +33,7 @@ export default function App(){
           {tab === 'Settings' && <Settings />}
         </div>
       </main>
+      {menuOpen && <div className="backdrop" onClick={()=> setMenuOpen(false)} />}
     </div>
   );
 }

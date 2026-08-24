@@ -34,6 +34,7 @@ export default function App(){
         </div>
       </main>
       {menuOpen && <div className="backdrop" onClick={()=> setMenuOpen(false)} />}
+      <button className="fab" aria-label="Open menu" onClick={()=> setMenuOpen(true)}>☰</button>
     </div>
   );
 }

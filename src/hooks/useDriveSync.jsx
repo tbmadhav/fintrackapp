@@ -145,7 +145,8 @@ export function useDriveSync({ transactions, budgets, settings, setSettings }){
 
   // Auto-sync uploads when local data changes
   useEffect(()=>{
-    if (!settings?.drive?.autoSync || !settings?.drive?.connected) return;
+    // Avoid triggering OAuth popup on page visit: only auto-upload after this tab has a token
+    if (!settings?.drive?.autoSync || !settings?.drive?.connected || !tokenRef.current?.access_token) return;
     const t = setTimeout(()=>{ syncNow().catch(()=>{}); }, 1500);
     return ()=> clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps

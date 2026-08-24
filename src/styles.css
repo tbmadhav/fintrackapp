@@ -80,3 +80,9 @@ label{font-weight:600;margin-top:8px;display:block}
 .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:90}
 .fab{display:none;position:fixed;left:14px;bottom:14px;z-index:95;border-radius:999px;padding:12px 14px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
 @media (max-width: 960px){ .close-side{display:inline-flex} .fab{display:inline-flex} }
+
+/* Always-visible mobile hamburger */
+@media (max-width: 960px){
+  .hamburger{display:inline-flex; position:fixed; top:10px; left:12px; z-index:120; margin:0}
+  .page-header{padding-left:44px}
+}

@@ -39,7 +39,7 @@ export default function TransactionsList(){
               <td>{t.paymentMethod}</td>
               <td>{(t.tags||[]).join(', ')}</td>
               <td className="small">{t.notes}</td>
-              <td><button onClick={()=> removeTransaction(t.id)}>Delete</button></td>
+              <td><button onClick={()=> { if (confirm('Delete this transaction?')) { removeTransaction(t.id); alert('Transaction deleted'); } }}>Delete</button></td>
             </tr>
           ))}
         </tbody>

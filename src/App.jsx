@@ -15,18 +15,20 @@ export default function App(){
   const banner = useBackupReminderBanner();
 
   return (
-    <div className="container">
-      <h1>FinTrack</h1>
-      {banner}
+    <div className="app-layout">
       <NavBar current={tab} setCurrent={setTab} items={sections} />
-      <div className="content">
-        {tab === 'Dashboard' && <Dashboard />} 
-        {tab === 'Add Entry' && <AddEntryForm onSaved={()=>setTab('Transactions')} />} 
-        {tab === 'Transactions' && <TransactionsList />} 
-        {tab === 'Budgets' && <Budgets />} 
-        {tab === 'Analysis' && <Analysis />} 
-        {tab === 'Settings' && <Settings />} 
-      </div>
+      <main className="main">
+        {banner}
+        <header className="page-header"><h2>{tab}</h2></header>
+        <div className="content">
+          {tab === 'Dashboard' && <Dashboard />}
+          {tab === 'Add Entry' && <AddEntryForm onSaved={()=>setTab('Transactions')} />}
+          {tab === 'Transactions' && <TransactionsList />}
+          {tab === 'Budgets' && <Budgets />}
+          {tab === 'Analysis' && <Analysis />}
+          {tab === 'Settings' && <Settings />}
+        </div>
+      </main>
     </div>
   );
 }

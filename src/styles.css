@@ -100,3 +100,7 @@ label{font-weight:600;margin-top:8px;display:block}
   .hamburger{display:inline-flex; position:fixed; top:10px; left:12px; z-index:120; margin:0}
   .page-header{padding-left:44px}
 }
+
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:140}
+.modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(720px,92vw);max-height:90vh;overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:16px;z-index:150}

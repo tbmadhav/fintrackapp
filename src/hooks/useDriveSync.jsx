@@ -153,7 +153,8 @@ export function useDriveSync({ transactions, budgets, settings, setSettings }){
 
   // Auto-pull: on start and every 60s, if remote modifiedTime > lastSyncAt, pull
   useEffect(()=>{
-    if (!settings?.drive?.autoSync || !settings?.drive?.connected) return;
+    // Avoid triggering OAuth prompt automatically: require a token in this tab/session first
+    if (!settings?.drive?.autoSync || !settings?.drive?.connected || !tokenRef.current?.access_token) return;
     let stopped = false;
     const check = async()=>{
       try{

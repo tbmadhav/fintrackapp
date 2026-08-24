@@ -25,7 +25,8 @@ Open the printed local URL.
 - Drive Sync lives in Settings → Google Drive Sync
 
 ## Deploy (GitHub Pages)
-- Push to main (or this branch) to trigger Actions.
+- In GitHub → Settings → Secrets and variables → Actions → Variables: add VITE_GOOGLE_CLIENT_ID with your OAuth Client ID.
+- Push to main to trigger Actions.
 - In GitHub → Settings → Pages → set Source: GitHub Actions.
 - App URL: https://tbmadhav.github.io/fintrackapp/
 

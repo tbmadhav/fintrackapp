@@ -1,10 +1,11 @@
 import React from 'react';
 import { useFin } from '../context/TransactionsContext.jsx';
 
-export default function NavBar({ items, current, setCurrent }){
+export default function NavBar({ items, current, setCurrent, mobileOpen=false, setMobileOpen }){
   const { transactions } = useFin();
+  const onClickItem = (i)=>{ setCurrent(i); if (window.innerWidth<=960 && setMobileOpen) setMobileOpen(false); };
   return (
-    <aside className="sidebar">
+    <aside className={"sidebar" + (mobileOpen? " open":"")}>
       <div className="brand">
         <div className="logo">₹</div>
         <div>
@@ -14,7 +15,7 @@ export default function NavBar({ items, current, setCurrent }){
       </div>
       <nav className="side-nav">
         {items.map(i=> (
-          <button key={i} className={"side-item "+(current===i? 'active':'')} onClick={()=> setCurrent(i)}>
+          <button key={i} className={"side-item "+(current===i? 'active':'')} onClick={()=> onClickItem(i)}>
             <span className="dot" />{i}
           </button>
         ))}

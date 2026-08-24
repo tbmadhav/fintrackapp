@@ -85,7 +85,8 @@ export function useDriveSync({ transactions, budgets, settings, setSettings }){
        budgets,
        settings
     };
-    const metadata = { name: FILE_NAME, parents: [folderId] };
+    // Only set parents on create. Updates must not include `parents` (Drive API requires addParents/removeParents params)
+    const metadata = fileId ? { name: FILE_NAME } : { name: FILE_NAME, parents: [folderId] };
     const boundary = 'fintrack-' + Math.random().toString(36).slice(2);
     const delimiter = `\r\n--${boundary}\r\n`;
     const closeDelim = `\r\n--${boundary}--`;

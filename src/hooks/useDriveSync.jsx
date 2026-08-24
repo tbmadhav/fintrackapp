@@ -55,12 +55,10 @@ export function useDriveSync({ transactions, budgets, settings, setSettings }){
   };
 
   const findOrCreateFolder = useCallback(async()=>{
-    // search for our folder
     const q = encodeURIComponent(`name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
     const list = await driveFetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name)`);
     const data = await list.json();
     if (data.files && data.files.length){ return data.files[0].id; }
-    // create it
     const meta = { name: FOLDER_NAME, mimeType: 'application/vnd.google-apps.folder' };
     const res = await driveFetch('https://www.googleapis.com/drive/v3/files', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(meta) });
     const created = await res.json();
@@ -74,13 +72,18 @@ export function useDriveSync({ transactions, budgets, settings, setSettings }){
     return data.files && data.files[0] ? data.files[0] : null;
   }, []);
 
+  const getFileMeta = useCallback(async(fileId)=>{
+    const res = await driveFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,name,modifiedTime`);
+    return res.json();
+  }, []);
+
   const uploadBackup = useCallback(async(folderId, fileId)=>{
     const payload = {
-      version: 1,
-      meta: { exportedAt: new Date().toISOString(), source: 'fintrack-web' },
-      transactions,
-      budgets,
-      settings
+       version: 1,
+       meta: { exportedAt: new Date().toISOString(), source: 'fintrack-web' },
+       transactions,
+       budgets,
+       settings
     };
     const metadata = { name: FILE_NAME, parents: [folderId] };
     const boundary = 'fintrack-' + Math.random().toString(36).slice(2);
@@ -98,8 +101,6 @@ export function useDriveSync({ transactions, budgets, settings, setSettings }){
   }, [transactions, budgets, settings]);
 
   const downloadBackup = useCallback(async(fileId)=>{
-    const metaRes = await driveFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,name,modifiedTime`);
-    await metaRes.json();
     const fileRes = await driveFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
     return fileRes.json();
   }, []);
@@ -118,10 +119,12 @@ export function useDriveSync({ transactions, budgets, settings, setSettings }){
       const folderId = settings?.drive?.folderId || (await findOrCreateFolder());
       const existing = settings?.drive?.fileId ? { id: settings.drive.fileId } : await findFileInFolder(folderId);
       const res = await uploadBackup(folderId, existing?.id);
-      setSettings(s=> ({...s, drive: { ...(s.drive||{}), connected: true, folderId, fileId: res.id, lastSyncAt: new Date().toISOString() }}));
+      // fetch meta to capture server modified time
+      const meta = await getFileMeta(res.id);
+      setSettings(s=> ({...s, drive: { ...(s.drive||{}), connected: true, folderId, fileId: res.id, lastSyncAt: new Date().toISOString(), lastRemoteMTime: meta?.modifiedTime||null }}));
       setStatus('ready');
     }catch(e){ setStatus('error'); throw e; }
-  }, [settings, connect, findOrCreateFolder, findFileInFolder, uploadBackup, setSettings]);
+  }, [settings, connect, findOrCreateFolder, findFileInFolder, uploadBackup, getFileMeta, setSettings]);
 
   const importFromDrive = useCallback(async()=>{
     setStatus('downloading'); if (!settings?.drive?.connected) await connect();
@@ -129,27 +132,46 @@ export function useDriveSync({ transactions, budgets, settings, setSettings }){
     const file = settings?.drive?.fileId ? { id: settings.drive.fileId } : await findFileInFolder(folderId);
     if (!file) throw new Error('No remote backup found');
     const json = await downloadBackup(file.id);
-    // validate minimal shape
     if (!json || typeof json!=='object' || !('transactions' in json) || !('budgets' in json) || !('settings' in json)) throw new Error('Invalid backup format');
-    // replace local
     localStorage.setItem(STORAGE_KEYS.tx, JSON.stringify(json.transactions||[]));
     localStorage.setItem(STORAGE_KEYS.budgets, JSON.stringify(json.budgets||{}));
     localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(json.settings||{}));
+    // track the remote modifiedTime we just consumed
+    try{ const meta = await getFileMeta(file.id); setSettings(s=> ({...s, drive: { ...(s.drive||{}), lastRemoteMTime: meta?.modifiedTime||s.drive?.lastRemoteMTime||null }})); }catch{}
     setStatus('ready');
-    // hard reload to reflect
     location.reload();
-  }, [settings, connect, findOrCreateFolder, findFileInFolder, downloadBackup]);
+  }, [settings, connect, findOrCreateFolder, findFileInFolder, downloadBackup, getFileMeta, setSettings]);
 
-  // Auto-sync when enabled: watch transactions and budgets only
+  // Auto-sync uploads when local data changes
   useEffect(()=>{
     if (!settings?.drive?.autoSync || !settings?.drive?.connected) return;
-    const t = setTimeout(()=>{ syncNow().catch(()=>{}); }, 2000);
+    const t = setTimeout(()=>{ syncNow().catch(()=>{}); }, 1500);
     return ()=> clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(transactions), JSON.stringify(budgets), settings?.drive?.autoSync, settings?.drive?.connected]);
 
+  // Auto-pull: on start and every 60s, if remote modifiedTime > lastSyncAt, pull
+  useEffect(()=>{
+    if (!settings?.drive?.autoSync || !settings?.drive?.connected) return;
+    let stopped = false;
+    const check = async()=>{
+      try{
+        const folderId = settings?.drive?.folderId || (await findOrCreateFolder());
+        const file = settings?.drive?.fileId ? { id: settings.drive.fileId } : await findFileInFolder(folderId);
+        if (!file) return;
+        const meta = await getFileMeta(file.id);
+        const remote = meta?.modifiedTime? new Date(meta.modifiedTime).getTime() : 0;
+        const last = settings?.drive?.lastRemoteMTime? new Date(settings.drive.lastRemoteMTime).getTime() : (settings?.drive?.lastSyncAt? new Date(settings.drive.lastSyncAt).getTime():0);
+        if (remote && remote>last && !stopped){ await importFromDrive(); }
+      }catch{ /* ignore transient errors */ }
+    };
+    check();
+    const iv = setInterval(check, 60000);
+    return ()=>{ stopped = true; clearInterval(iv); };
+  }, [settings?.drive?.autoSync, settings?.drive?.connected, settings?.drive?.folderId, settings?.drive?.fileId, settings?.drive?.lastRemoteMTime, settings?.drive?.lastSyncAt, findOrCreateFolder, findFileInFolder, getFileMeta, importFromDrive]);
+
   const disconnect = useCallback(()=>{
-    setSettings(s=> ({...s, drive: { connected: false, folderId: null, fileId: null, autoSync: false, lastSyncAt: null }}));
+    setSettings(s=> ({...s, drive: { connected: false, folderId: null, fileId: null, autoSync: false, lastSyncAt: null, lastRemoteMTime: null }}));
   }, [setSettings]);
 
   return {

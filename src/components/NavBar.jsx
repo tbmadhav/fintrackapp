@@ -8,10 +8,13 @@ export default function NavBar({ items, current, setCurrent, mobileOpen=false, s
     <aside className={"sidebar" + (mobileOpen? " open":"")}>
       <div className="brand">
         <div className="logo">₹</div>
-        <div>
+        <div style={{flex:1}}>
           <div className="brand-title">FinTrack</div>
           <div className="brand-sub">PLAN • TRACK • GROW</div>
         </div>
+        {setMobileOpen && (
+          <button className="close-side" aria-label="Close menu" onClick={()=> setMobileOpen(false)}>✕</button>
+        )}
       </div>
       <nav className="side-nav">
         {items.map(i=> (

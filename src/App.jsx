@@ -23,7 +23,7 @@ export default function App(){
           <button className="hamburger" aria-label="Open menu" onClick={()=> setMenuOpen(true)}>☰</button>
           <h2>{tab}</h2>
         </header>
-        {banner}
+        {tab !== 'Dashboard' && banner}
         <div className="content">
           {tab === 'Dashboard' && <Dashboard />}
           {tab === 'Add Entry' && <AddEntryForm onSaved={()=>setTab('Transactions')} />}

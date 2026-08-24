@@ -6,14 +6,12 @@ import TransactionsList from './components/TransactionsList.jsx';
 import Budgets from './components/Budgets.jsx';
 import Analysis from './components/Analysis.jsx';
 import Settings from './components/Settings.jsx';
-import { useBackupReminderBanner } from './hooks/useBackupReminder.jsx';
 
 const sections = ['Dashboard','Add Entry','Transactions','Budgets','Analysis','Settings'];
 
 export default function App(){
   const [tab, setTab] = useState('Dashboard');
   const [menuOpen, setMenuOpen] = useState(false);
-  const banner = useBackupReminderBanner();
 
   return (
     <div className="app-layout">
@@ -23,7 +21,6 @@ export default function App(){
           <button className="hamburger" aria-label="Open menu" onClick={()=> setMenuOpen(true)}>☰</button>
           <h2>{tab}</h2>
         </header>
-        {tab !== 'Dashboard' && banner}
         <div className="content">
           {tab === 'Dashboard' && <Dashboard />}
           {tab === 'Add Entry' && <AddEntryForm onSaved={()=>setTab('Transactions')} />}

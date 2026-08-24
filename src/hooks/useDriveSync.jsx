@@ -173,43 +173,6 @@ export function useDriveSync({ transactions, budgets, settings, setSettings }){
     return ()=>{ stopped = true; clearInterval(iv); };
   }, [settings?.drive?.autoSync, settings?.drive?.connected, settings?.drive?.folderId, settings?.drive?.fileId, settings?.drive?.lastRemoteMTime, settings?.drive?.lastSyncAt, findOrCreateFolder, findFileInFolder, getFileMeta, importFromDrive]);
 
-  // Silent token on focus/open to enable hands-free sync after consent
-  useEffect(()=>{
-    if (!settings?.drive?.connected) return;
-    let cancelled = false;
-    const trySilent = async()=>{
-      try{
-        if (!tokenRef.current?.access_token){ await ensureToken(''); }
-        if (settings?.drive?.autoSync && tokenRef.current?.access_token && !cancelled){
-          // do an immediate remote check once token is ready
-          try{
-            const folderId = settings?.drive?.folderId || (await findOrCreateFolder());
-            const file = settings?.drive?.fileId ? { id: settings.drive.fileId } : await findFileInFolder(folderId);
-            if (file){
-              const meta = await getFileMeta(file.id);
-              const remote = meta?.modifiedTime? new Date(meta.modifiedTime).getTime() : 0;
-              const last = settings?.drive?.lastRemoteMTime? new Date(settings.drive.lastRemoteMTime).getTime() : (settings?.drive?.lastSyncAt? new Date(settings.drive.lastSyncAt).getTime():0);
-              if (remote && remote>last && !cancelled){ await importFromDrive(); }
-            }
-          }catch{ /* ignore */ }
-        }
-      }catch{ /* silent attempt only */ }
-    };
-    const onVisible = ()=>{ if (document.visibilityState==='visible') trySilent(); };
-    const onFocus = ()=> trySilent();
-    const onOnline = ()=> trySilent();
-    // initial attempt on mount/open
-    trySilent();
-    window.addEventListener('focus', onFocus);
-    window.addEventListener('online', onOnline);
-    document.addEventListener('visibilitychange', onVisible);
-    return ()=>{
-      cancelled = true;
-      window.removeEventListener('focus', onFocus);
-      window.removeEventListener('online', onOnline);
-      document.removeEventListener('visibilitychange', onVisible);
-    };
-  }, [settings?.drive?.connected, settings?.drive?.autoSync, settings?.drive?.folderId, settings?.drive?.fileId, settings?.drive?.lastRemoteMTime, settings?.drive?.lastSyncAt, ensureToken, findOrCreateFolder, findFileInFolder, getFileMeta, importFromDrive]);
 
   const disconnect = useCallback(()=>{
     setSettings(s=> ({...s, drive: { connected: false, folderId: null, fileId: null, autoSync: false, lastSyncAt: null, lastRemoteMTime: null }}));

@@ -36,7 +36,7 @@ export default function AddEntryForm({ onSaved }){
   return (
     <form className="card" onSubmit={submit}>
       <h3>Add Transaction</h3>
-      <div className="grid">
+      <div className="form-grid">
         <div>
           <label>Type</label>
           <select value={type} onChange={(e)=> { setType(e.target.value); setForm(f=> ({...f, type: e.target.value})); }}>
@@ -89,8 +89,8 @@ export default function AddEntryForm({ onSaved }){
           <textarea rows="2" value={form.notes} onChange={e=> setForm(f=> ({...f, notes: e.target.value}))}></textarea>
         </div>
       </div>
-      <div style={{marginTop:8}}>
-        <button type="submit">Save</button>
+      <div className="row" style={{marginTop:8, justifyContent:'flex-end'}}>
+        <button className="btn btn-primary" type="submit">Save</button>
       </div>
     </form>
   );

@@ -18,11 +18,11 @@ export default function Dashboard(){
           <div className="small">Status: {drive.status} · Last Drive sync: {drive.lastSyncAt? new Date(drive.lastSyncAt).toLocaleString(): 'Never'}</div>
         </div>
         {!drive.connected ? (
-          <button onClick={drive.connect}>Connect Google Drive</button>
+          <button className="btn btn-primary" onClick={drive.connect}>Connect Google Drive</button>
         ) : (
           <div className="row">
-            <button onClick={async()=>{ try{ await drive.syncNow(); alert('Synced to Drive'); }catch(e){ console.error(e); alert('Sync failed: '+ (e?.message||e)); } }}>Sync Now</button>
-            <button onClick={async()=>{ try{ await drive.importFromDrive(); }catch(e){ console.error(e); alert('Import failed: '+ (e?.message||e)); } }}>Pull Latest</button>
+            <button className="btn btn-primary" onClick={async()=>{ try{ await drive.syncNow(); alert('Synced to Drive'); }catch(e){ console.error(e); alert('Sync failed: '+ (e?.message||e)); } }}>Sync Now</button>
+            <button className="btn btn-secondary" onClick={async()=>{ try{ await drive.importFromDrive(); }catch(e){ console.error(e); alert('Import failed: '+ (e?.message||e)); } }}>Pull Latest</button>
           </div>
         )}
       </div>

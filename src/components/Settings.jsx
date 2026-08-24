@@ -56,14 +56,14 @@ export default function Settings(){
       ) : (
         <>
           <div className="row">
-            <button onClick={drive.syncNow}>Sync Now (Upload)</button>
-            <button onClick={drive.importFromDrive}>Import From Drive</button>
+            <button onClick={async()=>{ try{ await drive.syncNow(); }catch(e){ console.error(e); alert('Sync failed: '+ (e?.message||e)); } }}>Sync Now (Upload)</button>
+            <button onClick={async()=>{ try{ await drive.importFromDrive(); }catch(e){ console.error(e); alert('Import from Drive failed: '+ (e?.message||e)); } }}>Import From Drive</button>
             <label style={{display:'flex',alignItems:'center',gap:6}}>
               <input type="checkbox" checked={drive.autoSync} onChange={e=> drive.setAutoSync(e.target.checked)} /> Auto-sync changes
             </label>
             <button onClick={drive.disconnect}>Disconnect</button>
           </div>
-          <div className="small">Last Drive sync: {drive.lastSyncAt? new Date(drive.lastSyncAt).toLocaleString(): 'Never'}</div>
+          <div className="small">Status: {drive.status} · Last Drive sync: {drive.lastSyncAt? new Date(drive.lastSyncAt).toLocaleString(): 'Never'}</div>
         </>
       )}
     </div>

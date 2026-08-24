@@ -28,6 +28,7 @@ export default function AddEntryForm({ onSaved }){
       };
       addTransaction(tx);
       setForm(f=> ({...f, amount:'', notes:'', tags:''}));
+      alert('Transaction saved');
       onSaved && onSaved();
     }catch(err){ alert(err.message); }
   };

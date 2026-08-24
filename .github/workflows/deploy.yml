@@ -25,6 +25,10 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
+      - name: Create env file for Vite
+        run: |
+          echo "VITE_GOOGLE_CLIENT_ID=${{ vars.VITE_GOOGLE_CLIENT_ID }}" >> .env.production
+          echo "Created .env.production"
       - name: Install
         run: npm ci
       - name: Build

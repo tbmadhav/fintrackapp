@@ -6,8 +6,8 @@ import MonthlyBar from './charts/MonthlyBar.jsx';
 import RunningBalance from './charts/RunningBalance.jsx';
 
 export default function Analysis(){
-  const { transactions, budgets } = useFin();
-  const a = useAnalytics(transactions, budgets);
+  const { transactions, budgets, settings } = useFin();
+  const a = useAnalytics(transactions, budgets, settings);
   return (
     <div className="grid grid-3">
       <div className="card"><h3>Category-wise Expenses</h3><CategoryPie data={a.catSeries} /></div>

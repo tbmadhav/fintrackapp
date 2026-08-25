@@ -126,6 +126,7 @@ export default function TransactionsList(){
               <div>
                 <label>Tags (comma separated)</label>
                 <input value={editing.tags||''} onChange={e=> setEditing(s=> ({...s, tags: e.target.value}))} />
+                <div className="small muted">Tip: Use cchdfc, ccicici, ccsaph for credit card tracking</div>
               </div>
               <div>
                 <label>Recurring</label>

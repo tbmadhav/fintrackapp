@@ -86,7 +86,7 @@ export default function TransactionsList(){
             <div className="form-grid" style={{marginTop:8}}>
               <div>
                 <label>Type</label>
-                <select value={editing.type} onChange={e=> setEditing(s=> ({...s, type: e.target.value}))}>
+                <select value={editing.type} onChange={e=> setEditing(s=> { const nt = e.target.value; const validList = nt==='income'? INCOME_CATEGORIES : EXPENSE_CATEGORIES; const nextCat = validList.includes(s.category)? s.category : validList[0]; return ({...s, type: nt, category: nextCat}); })}>
                   <option value="expense">Expense</option>
                   <option value="income">Income</option>
                 </select>

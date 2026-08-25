@@ -7,6 +7,15 @@ export default function AddEntryForm({ onSaved }){
   const [type, setType] = useState('expense');
   const cats = useMemo(()=> type==='expense'? EXPENSE_CATEGORIES: INCOME_CATEGORIES, [type]);
 
+  // Ensure category stays valid for the selected type
+  React.useEffect(()=>{
+    setForm(f=>{
+      const validList = type==='income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+      const nextCat = validList.includes(f.category) ? f.category : validList[0];
+      return nextCat===f.category ? f : { ...f, category: nextCat };
+    });
+  }, [type]);
+
   const [form, setForm] = useState({
     type: 'expense', category:'Food', amount: '', date: new Date().toISOString().slice(0,10), paymentMethod:'Cash', payee:'', receivedFrom:'', notes:'', tags:'', isRecurring:false
   });
@@ -42,7 +51,7 @@ export default function AddEntryForm({ onSaved }){
       <div className="form-grid">
         <div>
           <label>Type</label>
-          <select value={type} onChange={(e)=> { setType(e.target.value); setForm(f=> ({...f, type: e.target.value})); }}>
+          <select value={type} onChange={(e)=> { const nt = e.target.value; setType(nt); setForm(f=> { const validList = nt==='income'? INCOME_CATEGORIES: EXPENSE_CATEGORIES; return { ...f, type: nt, category: validList.includes(f.category)? f.category : validList[0] }; }); }}>
             <option value="expense">Expense</option>
             <option value="income">Income</option>
           </select>

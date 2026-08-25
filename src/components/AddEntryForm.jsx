@@ -11,6 +11,8 @@ export default function AddEntryForm({ onSaved }){
     type: 'expense', category:'Food', amount: '', date: new Date().toISOString().slice(0,10), paymentMethod:'Cash', payee:'', receivedFrom:'', notes:'', tags:'', isRecurring:false
   });
 
+  const [status, setStatus] = useState({ type: '', message: '' });
+
   const submit = (e)=>{
     e.preventDefault();
     try{
@@ -28,14 +30,15 @@ export default function AddEntryForm({ onSaved }){
       };
       addTransaction(tx);
       setForm(f=> ({...f, amount:'', notes:'', tags:''}));
-      alert('Transaction saved');
+      setStatus({ type: 'success', message: 'Transaction saved' });
       onSaved && onSaved();
-    }catch(err){ alert(err.message); }
+    }catch(err){ setStatus({ type: 'error', message: err.message }); }
   };
 
   return (
     <form className="card" onSubmit={submit}>
       <h3>Add Transaction</h3>
+      {status.message && (<div className={"status "+(status.type==='success'? 'success':'error')} role="status">{status.message}</div>)}
       <div className="form-grid">
         <div>
           <label>Type</label>

@@ -4,6 +4,7 @@ import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, PAYMENT_METHODS } from '../const
 
 export default function TransactionsList(){
   const { transactions, removeTransaction, updateTransaction } = useFin();
+  const [status, setStatus] = useState({ type:'', message:'' });
   const [q, setQ] = useState('');
   const [type, setType] = useState('all');
   const [editing, setEditing] = useState(null); // tx being edited
@@ -33,14 +34,15 @@ export default function TransactionsList(){
         tags: (editing.tags||'').split(',').map(s=> s.trim()).filter(Boolean),
         isRecurring: !!editing.isRecurring,
       });
-      alert('Transaction updated');
+      setStatus({type:'success', message:'Transaction updated'});
       setEditing(null);
-    }catch(e){ alert(e.message||String(e)); }
+    }catch(e){ setStatus({type:'error', message: e.message||String(e)}); }
   };
 
   return (
     <div className="card">
       <h3>Transactions</h3>
+      {status.message && (<div className={"status "+(status.type==='success'? 'success':'error')}>{status.message}</div>)}
       <div className="row" style={{marginBottom:8}}>
         <input placeholder="Search" value={q} onChange={e=> setQ(e.target.value)} />
         <select value={type} onChange={e=> setType(e.target.value)}>
@@ -68,7 +70,7 @@ export default function TransactionsList(){
               <td>
                 <div className="row" style={{gap:6}}>
                   <button className="btn btn-secondary" onClick={()=> startEdit(t)}>Edit</button>
-                  <button onClick={()=> { if (confirm('Delete this transaction?')) { removeTransaction(t.id); alert('Transaction deleted'); } }}>Delete</button>
+                  <button onClick={()=> { if (confirm('Delete this transaction?')) { removeTransaction(t.id); setStatus({type:'success', message:'Transaction deleted'}); } }}>Delete</button>
                 </div>
               </td>
             </tr>

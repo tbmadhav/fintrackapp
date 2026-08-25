@@ -10,7 +10,7 @@ import CreditCardBalances from './CreditCardBalances.jsx';
 export default function Dashboard(){
   const { transactions, budgets, settings, setSettings } = useFin();
   const drive = useDriveSync({ transactions, budgets, settings, setSettings });
-  const a = useAnalytics(transactions, budgets);
+  const a = useAnalytics(transactions, budgets, settings);
   return (
     <>
       <div className="card" style={{marginBottom:12, display:'flex', alignItems:'center', gap:12, justifyContent:'space-between'}}>

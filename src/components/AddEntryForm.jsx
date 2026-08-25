@@ -82,6 +82,7 @@ export default function AddEntryForm({ onSaved }){
         <div>
           <label>Tags (comma separated)</label>
           <input value={form.tags} onChange={e=> setForm(f=> ({...f, tags: e.target.value}))} />
+          <div className="small muted">Tip: Use cchdfc, ccicici, ccsaph for credit card tracking</div>
         </div>
         <div>
           <label>Recurring</label>

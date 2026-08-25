@@ -1,5 +1,5 @@
 export const EXPENSE_CATEGORIES = [
-  'Food','Groceries','Transport','Fuel','Rent','Utilities','Shopping','Entertainment','Health','Insurance','Education','Travel','Subscriptions','Gifts','Investments','Other'
+  'Food','Groceries','Transport','Fuel','Rent','Utilities','Shopping','Entertainment','Health','Insurance','Education','Travel','Subscriptions','Gifts','Investments','Payment to Credit Card','Other'
 ];
 export const INCOME_CATEGORIES = [
   'Salary','Bonus','Freelance','Interest','Dividends','Rental Income','Refund','Gift','Other'

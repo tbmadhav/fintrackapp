@@ -9,7 +9,9 @@ export const useFin = ()=> useContext(Ctx);
 const initialSettings = {
   currency: 'INR',
   backup: { frequency: 'Weekly', lastBackupAt: null, snoozedUntil: null, entriesSinceLastBackup: 0 },
-  drive: { connected: false, folderId: null, fileId: null, autoSync: false, lastSyncAt: null }
+  drive: { connected: false, folderId: null, fileId: null, autoSync: false, lastSyncAt: null },
+  // Optional default card setup; will be initialized in the widget if missing
+  cards: undefined
 };
 
 export function TransactionsProvider({ children }){

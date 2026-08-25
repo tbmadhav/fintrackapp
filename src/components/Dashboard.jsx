@@ -5,6 +5,7 @@ import { useDriveSync } from '../hooks/useDriveSync.jsx';
 import CategoryPie from './charts/CategoryPie.jsx';
 import MonthlyBar from './charts/MonthlyBar.jsx';
 import RunningBalance from './charts/RunningBalance.jsx';
+import CreditCardBalances from './CreditCardBalances.jsx';
 
 export default function Dashboard(){
   const { transactions, budgets, settings, setSettings } = useFin();
@@ -26,6 +27,8 @@ export default function Dashboard(){
           </div>
         )}
       </div>
+
+      <CreditCardBalances />
 
       <div className="metrics4">
         <div className="card metric"><div className="label">Total Income</div><div className="value">₹ {a.income.toFixed(2)}</div></div>
